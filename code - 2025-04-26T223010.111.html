@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSC সিলেবাস ও নোটস ম্যানেজার - ২০২৬ সংস্করণ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- General Styles --- */
+        body {
+            font-family: 'Noto Sans Bengali', sans-serif;
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa; /* Very light grey background */
+            color: #212529; /* Dark grey text */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            display: flex; /* Use flexbox for centering content */
+            justify-content: center;
+            align-items: flex-start; /* Align to top */
+            min-height: 100vh; /* Minimum viewport height */
+        }
+
+        .container {
+            width: 100%; /* Take full width on small screens */
+            max-width: 1200px; /* Slightly wider container */
+            margin: 25px; /* Add margin on all sides */
+            padding: 40px; /* More padding */
+            background-color: #ffffff;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Stronger shadow */
+            border-radius: 15px; /* More rounded corners */
+            box-sizing: border-box; /* Include padding in element's total width */
+        }
+         @media (max-width: 1240px) {
+            .container {
+                 margin: 25px 15px; /* Reduce side margin on smaller screens */
+                 padding: 30px; /* Reduce padding */
+            }
+         }
+
+
+        h1, h2, h3 {
+            text-align: center;
+            color: #0056b3; /* Primary blue */
+            margin-bottom: 25px;
+            font-weight: 700; /* Bolder headings */
+        }
+
+        h1 {
+            color: #004085; /* Darker blue for main title */
+            margin-bottom: 35px;
+            font-size: 2.5em; /* Larger main title */
+        }
+
+        p.subtitle {
+            text-align: center;
+            margin-top: -20px;
+            margin-bottom: 40px; /* More space below subtitle */
+            color: #5a6268; /* Subdued grey */
+            font-size: 1.1em;
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #dee2e6; /* Light grey line */
+            margin: 40px 0; /* More vertical space */
+        }
+
+        /* --- Custom Title Section --- */
+        .custom-title-section {
+            margin-bottom: 40px;
+            padding: 25px; /* More padding */
+            background-color: #e9ecef; /* Light grey background */
+            border: 1px solid #ced4da; /* Light border */
+            border-radius: 8px;
+        }
+
+        .custom-title-section label {
+            display: block;
+            margin-bottom: 12px; /* More space below label */
+            font-weight: bold;
+            color: #0056b3; /* Primary blue */
+            font-size: 1.1em;
+        }
+
+        .custom-title-section input[type="text"] {
+            width: 100%; /* Full width within parent */
+            padding: 14px; /* More padding */
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 1em;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .custom-title-section input[type="text"]:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+
+
+        /* --- Subject and Chapter Listing --- */
+        .subject-list {
+            margin-bottom: 30px;
+        }
+
+        .subject {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 18px; /* More space between subjects */
+            border-radius: 10px; /* More rounded */
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .subject:hover {
+             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Slightly stronger hover shadow */
+        }
+
+        .subject-header {
+            padding: 20px 25px; /* More padding */
+            cursor: pointer;
+            background: linear-gradient(to right, #007bff, #0056b3); /* Gradient background */
+            color: white;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+            font-size: 1.2em; /* Larger subject titles */
+            user-select: none; /* Prevent text selection on header */
+        }
+
+        .subject-header:hover {
+            background: linear-gradient(to right, #0056b3, #004085);
+        }
+
+        .subject-header .arrow {
+            font-size: 1.4em; /* Larger arrow */
+            transition: transform 0.4s ease; /* Slower transition */
+        }
+
+        .subject-header.active .arrow {
+            transform: rotate(90deg);
+        }
+
+        .subject-content { /* Container for chapter list and subject notes */
+             display: grid;
+             grid-template-columns: 1fr;
+             gap: 20px; /* Gap between sections */
+             padding: 20px 25px; /* Padding matches header */
+             background-color: #fefefe; /* Slightly off-white background */
+             border-top: 1px solid #eee;
+             overflow: hidden;
+             max-height: 0;
+             transition: max-height 0.6s ease-in-out; /* Slower animation */
+             will-change: max-height; /* Performance hint */
+        }
+
+        .subject-content.open {
+             max-height: 3000px; /* Large enough value, may need adjustment */
+             transition: max-height 0.7s ease-in-out; /* Slightly slower transition when opening */
+        }
+
+         @media (min-width: 850px) { /* Adjusted breakpoint */
+            .subject-content.open {
+                 grid-template-columns: 2fr 1fr; /* Two columns on wider screens */
+                 gap: 30px; /* More gap */
+             }
+             .chapter-list {
+                 /* min-width handled by grid */
+             }
+         }
+
+
+        .chapter-list h3, .subject-notes h3 {
+            text-align: left;
+            color: #0056b3;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.3em; /* Larger sub-headings */
+            font-weight: 600;
+        }
+
+        /* Style for Bengali 1st Paper Godya/Podya/etc sections */
+         .chapter-group-heading {
+             font-size: 1.15em;
+             font-weight: 600;
+             color: #004085; /* Darker blue */
+             margin-top: 20px;
+             margin-bottom: 10px;
+             border-bottom: 1px solid #eee;
+             padding-bottom: 5px;
+         }
+         .chapter-group-heading:first-child {
+             margin-top: 0; /* No top margin for the first group */
+         }
+
+
+         .chapter-list ul {
+             list-style: none; /* Remove default list style */
+             padding: 0;
+             margin: 0;
+         }
+          .chapter-list ul li {
+             margin-bottom: 10px;
+          }
+
+
+        .chapter-list label {
+            display: flex;
+            align-items: center; /* Center align checkbox and text */
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 1.05em;
+            color: #495057; /* Slightly darker text */
+            transition: color 0.2s ease;
+        }
+        .chapter-list label:hover {
+            color: #000; /* Darker on hover */
+        }
+
+        .chapter-list input[type="checkbox"] {
+            margin-right: 12px; /* More space */
+            flex-shrink: 0;
+            width: 20px; /* Explicit size */
+            height: 20px; /* Explicit size */
+            border: 2px solid #ced4da; /* Thicker border */
+            border-radius: 4px; /* Slight roundness */
+            cursor: pointer;
+            position: relative; /* For custom styling */
+             /* Hide default checkbox */
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            outline: none;
+            transition: border-color 0.2s ease, background-color 0.2s ease;
+            background-color: #fff; /* White background */
+        }
+
+        /* Custom Checkbox Style */
+        .chapter-list input[type="checkbox"]::before {
+            content: '\2713'; /* Checkmark symbol */
+            display: flex; /* Use flex to center checkmark */
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            color: white; /* White checkmark */
+            background-color: #007bff; /* Blue checked color */
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform: scale(0); /* Start scaled to 0 */
+            transition: transform 0.2s ease;
+            border-radius: 2px;
+             opacity: 0; /* Hide checkmark initially */
+        }
+
+        .chapter-list input[type="checkbox"]:checked::before {
+            transform: scale(1); /* Scale to 1 when checked */
+             opacity: 1; /* Show checkmark */
+        }
+         .chapter-list input[type="checkbox"]:focus {
+             border-color: #007bff;
+             box-shadow: 0 0 0 0.15rem rgba(0, 123, 255, 0.25);
+         }
+
+
+        /* --- Subject Notes Section (within subject content) --- */
+        .subject-notes {
+            background-color: #eef7ff; /* Lighter blueish background */
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #cce5ff;
+            display: flex; /* Use flex for textarea to fill space */
+            flex-direction: column;
+            height: 100%; /* Ensure it takes full height in grid */
+            box-sizing: border-box;
+        }
+
+        .subject-notes textarea {
+             width: 100%;
+             flex-grow: 1; /* Takes available space */
+             min-height: 150px; /* Minimum height */
+             padding: 12px; /* More padding */
+             border: 1px solid #b8daff;
+             border-radius: 5px;
+             font-size: 0.98em; /* Slightly larger font */
+             resize: vertical;
+             box-sizing: border-box;
+             font-family: 'Noto Sans Bengali', sans-serif;
+             line-height: 1.6;
+             transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+         .subject-notes textarea:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            outline: none;
+         }
+
+
+        /* --- Button Section --- */
+        .button-section {
+            text-align: center;
+            margin-bottom: 50px; /* More space */
+        }
+
+        .button-section button {
+            padding: 14px 30px; /* More padding */
+            margin: 0 12px; /* More margin */
+            font-size: 1.05em;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px; /* More rounded */
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.2s ease;
+            font-weight: 600;
+            min-width: 180px; /* Minimum width for buttons */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-transform: uppercase; /* Uppercase text */
+        }
+
+        .button-section button:hover {
+            opacity: 0.95; /* Less opacity change */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .button-section button:active {
+             transform: translateY(0);
+             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        #show-summary-btn {
+            background-color: #28a745; /* Green */
+            color: white;
+        }
+         #show-summary-btn:hover {
+             background-color: #218838;
+         }
+
+        #print-syllabus-btn {
+            background-color: #17a2b8; /* Cyan */
+            color: white;
+        }
+         #print-syllabus-btn:hover {
+             background-color: #138496;
+         }
+
+        #clear-selection-btn {
+            background-color: #dc3545; /* Red */
+            color: white;
+        }
+         #clear-selection-btn:hover {
+             background-color: #c82333;
+         }
+
+
+        /* --- Summary Section --- */
+        .summary-section {
+            margin-top: 30px;
+            padding: 35px; /* More padding */
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 10px;
+            display: none; /* Hidden by default */
+        }
+
+        .summary-section h2 {
+            margin-top: 0;
+            color: #0056b3;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+
+         .summary-section h3.summary-title {
+            margin-top: 0;
+            color: #004085; /* Darker blue */
+            margin-bottom: 30px; /* More space */
+            font-size: 2em; /* Larger title */
+            font-weight: 700;
+         }
+
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Subtle table shadow */
+        }
+
+        .summary-table th, .summary-table td {
+            border: 1px solid #dee2e6;
+            padding: 15px; /* More padding */
+            text-align: left;
+        }
+
+        .summary-table th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 1.05em;
+        }
+
+        .summary-table tbody tr:nth-child(even) {
+            background-color: #f8f9fa; /* Light stripe */
+        }
+
+         .summary-table tbody tr:hover {
+             background-color: #e9ecef; /* Highlight on hover */
+         }
+
+         .summary-table td ul {
+             list-style: disc;
+             padding-left: 25px; /* More padding */
+             margin: 0;
+         }
+         .summary-table td ul li {
+             margin-bottom: 8px; /* More space */
+             line-height: 1.6;
+         }
+         .summary-table td ul li:last-child {
+             margin-bottom: 0;
+         }
+
+        /* --- Notes Section (Global) --- */
+        .global-notes-section {
+            margin-top: 40px; /* More space */
+            padding: 30px; /* More padding */
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            border-radius: 10px;
+        }
+
+        .global-notes-section h2 {
+            margin-top: 0;
+            color: #0056b3;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        #global-notes-textarea {
+            width: 100%;
+            min-height: 280px; /* More height */
+            padding: 15px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 1em;
+            resize: vertical;
+            box-sizing: border-box;
+            font-family: 'Noto Sans Bengali', sans-serif;
+            line-height: 1.6;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+         #global-notes-textarea:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            outline: none;
+         }
+
+        .global-notes-section p small {
+            display: block;
+            margin-top: 10px;
+            text-align: center;
+            color: #6c757d; /* Subdued grey */
+        }
+
+        /* --- Summary Display Notes (within summary section) --- */
+         .summary-notes-container {
+             margin-top: 30px; /* More space */
+             padding-top: 25px; /* More padding */
+             border-top: 2px dashed #a9a9a9; /* Darker dashed separator */
+         }
+
+         .summary-notes-container h3 {
+             margin-top: 0;
+             margin-bottom: 20px; /* More space */
+             color: #0056b3;
+             font-size: 1.6em; /* Larger heading */
+             text-align: left;
+             border-bottom: 1px solid #ddd; /* Lighter border */
+             padding-bottom: 10px;
+         }
+
+         .summary-notes-item { /* Individual note block in summary */
+             margin-bottom: 25px; /* More space between notes */
+             padding: 20px; /* More padding */
+             background-color: #f1f8ff; /* Very light blue background */
+             border: 1px solid #cfe2ff; /* Light blue border */
+             border-radius: 8px;
+             word-wrap: break-word; /* Prevent overflow */
+             overflow-wrap: break-word; /* Prevent overflow */
+         }
+
+         .summary-notes-item h4 { /* Subject note heading in summary */
+             margin-top: 0;
+             margin-bottom: 12px; /* More space */
+             color: #007bff; /* Primary blue */
+             font-size: 1.2em; /* Larger heading */
+             font-weight: 600;
+         }
+
+         .summary-notes-item pre {
+             white-space: pre-wrap;
+             word-wrap: break-word;
+             margin: 0;
+             padding: 0;
+             font-family: 'Noto Sans Bengali', sans-serif;
+             font-size: 1em;
+             line-height: 1.6;
+             color: #212529; /* Dark grey text */
+         }
+
+         .summary-notes-item.global-notes {
+             background-color: #d4edda; /* Light green background */
+             border-color: #c3e6cb; /* Light green border */
+         }
+         .summary-notes-item.global-notes h4 {
+              color: #155724; /* Dark green heading */
+         }
+
+
+        /* --- Print Specific Styles --- */
+        @media print {
+            body {
+                background-color: #fff;
+                padding: 0;
+                margin: 0;
+                font-size: 10pt; /* Slightly smaller font size for print density */
+                -webkit-print-color-adjust: exact !important; /* Ensure colors print */
+                color-adjust: exact !important; /* Ensure colors print */
+            }
+            .container {
+                box-shadow: none;
+                padding: 10mm; /* Smaller padding for print */
+                margin: 0 auto;
+                width: 100%;
+                max-width: 100%;
+                border-radius: 0;
+            }
+            h1, p.subtitle, .subject-list, .button-section, .custom-title-section, .global-notes-section {
+                display: none; /* Hide unnecessary parts */
+            }
+
+            .summary-section {
+                display: block !important;
+                margin-top: 0;
+                padding: 0;
+                background-color: #fff;
+                border: none;
+                box-shadow: none;
+            }
+
+            .summary-section h2 {
+                 display: none; /* Hide "নির্বাচিত সিলেবাসের সারসংক্ষেপ" heading in print */
+            }
+
+             h3.summary-title {
+                display: block !important;
+                text-align: center !important;
+                margin-bottom: 20px !important; /* Reduced margin for print */
+                color: #000 !important; /* Black title for print clarity */
+                font-size: 1.6em !important; /* Adjusted font size for print */
+                font-weight: 700 !important;
+                page-break-after: avoid;
+             }
+
+
+             .summary-table {
+                margin-top: 15px;
+                border-collapse: collapse;
+                width: 100%;
+                page-break-inside: auto;
+             }
+
+             .summary-table th, .summary-table td {
+                border: 1px solid #666 !important; /* Darker border for print */
+                padding: 8px; /* Reduced padding for print */
+                text-align: left;
+             }
+
+             .summary-table th {
+                background-color: #e9ecef !important; /* Light background for print header */
+                color: #000 !important; /* Black text */
+                font-weight: bold !important;
+                text-transform: uppercase !important;
+             }
+
+             .summary-table tbody tr:nth-child(even) {
+                 background-color: #f8f9fa !important; /* Light stripe */
+             }
+             .summary-table tbody tr:hover {
+                 background-color: #f8f9fa !important; /* No hover effect on print */
+             }
+
+             .summary-table td ul {
+                 list-style: disc;
+                 padding-left: 20px;
+                 margin: 0;
+             }
+              .summary-table td ul li {
+                 margin-bottom: 2px; /* Reduced space in print */
+                 line-height: 1.3;
+              }
+              .summary-table td ul li:last-child {
+                 margin-bottom: 0;
+             }
+
+            /* --- Summary Display Notes (Print) --- */
+             .summary-notes-container {
+                 margin-top: 25px; /* Reduced space */
+                 padding-top: 15px;
+                 border-top: 1px dashed #666 !important; /* Darker dashed separator */
+                 page-break-before: auto;
+             }
+              .summary-notes-container h3 {
+                 color: #000 !important; /* Black heading */
+                 border-bottom-color: #bbb !important;
+                 font-size: 1.3em !important;
+                 margin-bottom: 15px !important;
+              }
+
+             .summary-notes-item {
+                 margin-bottom: 15px; /* Reduced space */
+                 padding: 10px; /* Reduced padding */
+                 background-color: #e9ecef !important; /* Light grey background for print notes */
+                 border: 1px solid #a0a0a0 !important; /* Darker border */
+                 border-radius: 5px;
+                 page-break-inside: avoid;
+             }
+
+              .summary-notes-item h4 {
+                 color: #000 !important; /* Black heading for subject notes */
+                 font-size: 1.1em !important;
+                 font-weight: 600 !important;
+                 margin-bottom: 8px !important; /* Reduced space */
+              }
+               .summary-notes-item.global-notes {
+                  background-color: #d4edda !important; /* Light green background */
+                   border-color: #a0a0a0 !important; /* Darker border */
+               }
+               .summary-notes-item.global-notes h4 {
+                   color: #000 !important; /* Black heading for global notes */
+               }
+
+              .summary-notes-item pre {
+                  font-size: 0.95em !important; /* Slightly smaller font for notes in print */
+                  line-height: 1.5 !important;
+                  color: #000 !important;
+              }
+
+             /* Adjust table layout for printing long chapter lists */
+             .summary-table td {
+                 word-break: break-word;
+             }
+
+        } /* End Print Media Query */
+
+
+         /* --- Basic Responsiveness --- */
+        @media (max-width: 850px) { /* Adjusted breakpoint */
+            .container {
+                padding: 20px;
+                margin: 15px; /* Ensure margin on sides */
+            }
+             h1 { font-size: 2em; margin-bottom: 30px; }
+             h2 { font-size: 1.6em; margin-bottom: 20px; }
+             p.subtitle { font-size: 1em; margin-bottom: 30px; }
+             hr { margin: 30px 0;}
+
+            .button-section {
+                flex-direction: column;
+                align-items: center;
+            }
+            .button-section button {
+                margin: 8px 0;
+                width: 95%;
+                padding: 12px 15px;
+                font-size: 1em;
+                min-width: auto;
+            }
+             .subject-header {
+                 padding: 15px 20px;
+                 font-size: 1.1em;
+             }
+            .subject-content {
+                 padding: 15px 20px;
+                 gap: 15px;
+            }
+             .chapter-list h3, .subject-notes h3 { font-size: 1.1em; margin-bottom: 12px; }
+             .chapter-group-heading { font-size: 1em; margin-top: 15px; margin-bottom: 8px;}
+             .chapter-list ul li { margin-bottom: 8px;}
+
+             .chapter-list label {
+                 font-size: 0.98em;
+                 margin-bottom: 10px;
+             }
+              .chapter-list input[type="checkbox"] {
+                 margin-right: 10px;
+                 width: 18px;
+                 height: 18px;
+                 border-width: 1px;
+              }
+               .chapter-list input[type="checkbox"]::before {
+                   width: 14px; /* Adjusted checkmark size */
+                   height: 14px;
+               }
+
+             .summary-table th, .summary-table td {
+                 padding: 10px;
+                 font-size: 0.95em;
+             }
+             .custom-title-section input[type="text"], #global-notes-textarea, .subject-notes textarea {
+                 padding: 10px;
+                 font-size: 1em;
+             }
+             .custom-title-section { padding: 20px;}
+             .global-notes-section { padding: 20px; margin-top: 30px;}
+
+             .summary-section {
+                 padding: 25px;
+                 margin-top: 20px;
+             }
+             .summary-section h3.summary-title {
+                 font-size: 1.6em;
+                 margin-bottom: 20px;
+             }
+              .summary-notes-container h3 {
+                 font-size: 1.3em;
+                 margin-bottom: 15px;
+              }
+              .summary-notes-item {
+                  padding: 15px;
+                  margin-bottom: 20px;
+              }
+              .summary-notes-item h4 {
+                 font-size: 1.1em;
+                 margin-bottom: 10px;
+              }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>এইচএসসি সিলেবাস ও নোটস ম্যানেজার (২০২৬ সংস্করণ)</h1>
+        <p class="subtitle">আপনার পরীক্ষার জন্য প্রয়োজনীয় অধ্যায় নির্বাচন করুন এবং বিষয়ভিত্তিক ও সার্বজনীন নোট লিখুন।</p>
+
+        <div class="custom-title-section">
+            <label for="syllabus-title">সিলেবাসের শিরোনাম:</label>
+            <input type="text" id="syllabus-title" placeholder="যেমন: এইচএসসি ফাইনাল পূর্ণাঙ্গ সিলেবাস ২০২৬">
+        </div>
+
+        <hr>
+
+        <div class="subject-list" id="subjects-container">
+            <h2>বিষয় এবং অধ্যায় তালিকা (বিজ্ঞান বিভাগ - ২০২৬ পূর্ণাঙ্গ সিলেবাস)</h2>
+            <!-- Subject and chapter list will be populated here by JavaScript -->
+        </div>
+
+        <hr>
+
+        <div class="button-section">
+            <button id="show-summary-btn">নির্বাচিত সিলেবাস দেখান</button>
+            <button id="print-syllabus-btn">সিলেবাস প্রিন্ট করুন</button>
+            <button id="clear-selection-btn">নির্বাচন বাতিল করুন</button>
+        </div>
+
+        <div class="summary-section" id="summary-section">
+            <!-- Custom Title will be inserted here -->
+            <h3 class="summary-title" id="summary-display-title"></h3>
+             <h2>নির্বাচিত সিলেবাসের সারসংক্ষেপ</h2>
+            <div id="summary-content">
+                <!-- Summary table will be generated here by JavaScript -->
+                <p>কোন অধ্যায় নির্বাচন করা হয়নি।</p>
+            </div>
+             <div class="summary-notes-container" id="summary-display-notes-container" style="display: none;">
+                 <h3>নোটস</h3>
+                 <!-- Subject notes and global notes will be added here -->
+             </div>
+        </div>
+
+         <hr>
+
+        <div class="global-notes-section">
+            <h2>সার্বজনীন নোটস</h2>
+            <textarea id="global-notes-textarea" placeholder="এখানে আপনার সাধারণ নোট লিখুন (যেগুলো কোনো নির্দিষ্ট বিষয়ের জন্য নয়)..."></textarea>
+            <p><small>নোটগুলো স্বয়ংক্রিয়ভাবে সংরক্ষিত হবে।</small></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Define subjects and chapters data
+            // ** HSC 2026 Full Syllabus Note: **
+            // The syllabus data below is based on the provided list for the
+            // potential 2026 full syllabus for the Science group.
+            // Please cross-check with the final official syllabus released by the education board
+            // and update the 'chapters' arrays below if necessary.
+            // English 1st Paper units are based on the common structure of the "English for Today" book;
+            // verify against the specific NCTB edition for 2026 when available.
+            const subjects = [
+                {
+                    name: "বাংলা প্রথম পত্র",
+                    chapters: [
+                        // গদ্য (Prose)
+                        "গদ্য: বাঙ্গালার নব্য লেখকদিগের প্রতি নিবেদন (বঙ্কিমচন্দ্র চট্টোপাধ্যায়)",
+                        "গদ্য: অপরিচিতা (রবীন্দ্রনাথ ঠাকুর)",
+                        "গদ্য: সাহিত্যে খেলা (প্রমথ চৌধুরী)",
+                        "গদ্য: বিলাসী (শরৎচন্দ্র চট্টোপাধ্যায়)",
+                        "গদ্য: অর্ধাঙ্গী (রোকেয়া সাখাওয়াত হোসেন)",
+                        "গদ্য: যৌবনের গান (কাজী নজরুল ইসলাম)",
+                        "গদ্য: জীবন ও বৃক্ষ (মোতাহের হোসেন চৌধুরী)",
+                        "গদ্য: গন্তব্য কাবুল (সৈয়দ মুজতবা আলী)",
+                        "গদ্য: মাসি-পিসি (মানিক বন্দ্যোপাধ্যায়)",
+                        "গদ্য: কপিলদাস মুর্মুর শেষ কাজ (শওকত আলী)",
+                        "গদ্য: রেইনকোট (আখতারুজ্জামান ইলিয়াস)",
+                        "গদ্য: নেকলেস (গী দ্য মোপাসাঁ)",
+                        // পদ্য (Poetry)
+                        "পদ্য: ঋতু-বর্ণন (আলাওল)",
+                        "পদ্য: বিভীষণের প্রতি মেঘনাদ (মাইকেল মধুসূদন দত্ত)",
+                        "পদ্য: সোনার তরী (রবীন্দ্রনাথ ঠাকুর)",
+                        "পদ্য: বিদ্রোহী (কাজী নজরুল ইসলাম)",
+                        "পদ্য: সুচেতনা (জীবনানন্দ দাশ)",
+                        "পদ্য: প্রতিদান (জসীমউদ্দীন)",
+                        "পদ্য: তাহারেই পড়ে মনে (সুফিয়া কামাল)",
+                        "পদ্য: পদ্মা (ফররুখ আহমদ)",
+                        "পদ্য: ফেব্রুয়ারি ১৯৬৯ (শামসুর রাহমান)",
+                        "পদ্য: আঠারো বছর বয়স (সুকান্ত ভট্টাচার্য)",
+                        "পদ্য: আমি কিংবদন্তির কথা বলছি (আবু জাফর ওবায়দুল্লাহ্)",
+                        "পদ্য: প্রত্যাবর্তনের লজ্জা (আল মাহমুদ)",
+                        // সহপাঠ (Novel & Drama)
+                        "সহপাঠ: লালসালু (উপন্যাস) - সৈয়দ ওয়ালীউল্লাহ",
+                        "সহপাঠ: সিরাজউদ্দৌলা (নাটক) - সিকান্দার আবু জাফর"
+                    ].filter(chapter => chapter.trim() !== ""), // Remove any empty entries
+                },
+                {
+                    name: "বাংলা দ্বিতীয় পত্র",
+                    chapters: [
+                       "ব্যাকরণ: বাংলা উচ্চারণের নিয়ম",
+                       "ব্যাকরণ: বাংলা বানানের নিয়ম",
+                       "ব্যাকরণ: বাংলা ভাষার ব্যাকরণিক শব্দশ্রেণি",
+                       "ব্যাকরণ: বাংলা শব্দ গঠন (উপসর্গ, প্রত্যয়, সমাস)",
+                       "ব্যাকরণ: বাক্যতত্ত্ব",
+                       "ব্যাকরণ: বাংলা ভাষার অপপ্রয়োগ ও শুদ্ধ প্রয়োগ",
+                       "নির্মিতি: পারিভাষিক শব্দ ও অনুবাদ",
+                       "নির্মিতি: দিনলিপি লিখন ও অভিজ্ঞতা বর্ণনা/প্রতিবেদন রচনা",
+                       "নির্মিতি: বৈদ্যুতিন চিঠি/আবেদনপত্র",
+                       "নির্মিতি: সারাংশ/সারমর্ম ও ভাবসম্প্রসারণ",
+                       "নির্মিতি: সংলাপ রচনা ও ক্ষুদে গল্প রচনা",
+                       "নির্মিতি: প্রবন্ধ রচনা"
+                    ].filter(chapter => chapter.trim() !== ""),
+                },
+                {
+                    name: "English 1st Paper",
+                    chapters: [
+                        // Note: Unit titles are placeholders based on common 'English for Today' structure. Verify with 2026 NCTB book.
+                        "Unit: Unit 1: People or Institutions Making History",
+                        "Unit: Unit 2: Greatest Scientific Achievements", // Example: Updated/Generic Title
+                        "Unit: Unit 3: Dreams", // Example: Updated/Generic Title
+                        "Unit: Unit 4: Human Relationships",
+                        "Unit: Unit 5: Adolescence", // Example: Updated/Generic Title
+                        "Unit: Unit 6: Peace and Conflict", // Example: Updated/Generic Title
+                        "Unit: Unit 7: Traffic Education", // Example: Updated/Generic Title
+                        "Unit: Unit 8: Human Rights", // Example: Updated/Generic Title
+                        "Unit: Unit 9: Diaspora", // Example: Updated/Generic Title
+                        "Unit: Unit 10: Environment and Nature", // Example: Updated/Generic Title
+                        "Unit: Unit 11: Tours and Travels", // Example: Updated/Generic Title
+                        "Unit: Unit 12: Art and Music", // Example: Updated/Generic Title
+                        "Unit: Unit 13: Food Adulteration", // Example: Adding potential units
+                        "Unit: Unit 14: Myths and Literature", // Example: Adding potential units
+                        "Unit: Unit 15: Challenges of the 21st Century", // Example: Adding potential units
+                        "বিশেষ অংশ: Reading And Pleasure (মূল্যায়নের জন্য)", // As mentioned in the prompt
+                        // Poems and Writing tasks might be integrated within units or specified separately by the board.
+                        // Adding placeholders as they are common components:
+                        "Writing: Paragraph Writing",
+                        "Writing: Story Writing",
+                        "Writing: Formal Letter / Email",
+                        "Writing: Graph/Chart Description",
+                        "Writing: Poem Analysis / Theme Writing",
+                    ].filter(chapter => chapter.trim() !== ""),
+                },
+                {
+                    name: "English 2nd Paper",
+                    chapters: [
+                        "Grammar: Articles",
+                        "Grammar: Prepositions",
+                        "Grammar: Phrases & Words",
+                        "Grammar: Completing Sentences",
+                        "Grammar: Right form of Verbs",
+                        "Grammar: Transformation of Sentences/Change of Sentences",
+                        "Grammar: Narration",
+                        "Grammar: Pronoun Reference",
+                        "Grammar: Modifiers",
+                        "Grammar: Sentence Connectors",
+                        "Grammar: Punctuation",
+                        "Grammar: Synonyms & Antonyms",
+                        "Composition: Formal Letter/Email Writing",
+                        "Composition: Report Writing/Writing Paragraph (Listing/Description)",
+                        "Composition: Paragraph Writing (Comparison and Contrast/Cause and Effect)",
+                        "Composition: Composition Writing"
+                    ].filter(chapter => chapter.trim() !== ""),
+                },
+                {
+                    name: "তথ্য ও যোগাযোগ প্রযুক্তি (ICT)",
+                    chapters: [
+                        "অধ্যায় ১: তথ্য ও যোগাযোগ প্রযুক্তি: বিশ্ব ও বাংলাদেশ প্রেক্ষিত",
+                        "অধ্যায় ২: কমিউনিকেশন সিস্টেমস ও নেটওয়ার্কিং",
+                        "অধ্যায় ৩: সংখ্যা পদ্ধতি ও ডিজিটাল ডিভাইস",
+                        "অধ্যায় ৪: ওয়েব ডিজাইন পরিচিতি এবং HTML",
+                        "অধ্যায় ৫: প্রোগ্রামিং ভাষা",
+                        "অধ্যায় ৬: ডেটাবেজ ম্যানেজমেন্ট সিস্টেম"
+                    ].filter(chapter => chapter.trim() !== ""),
+                },
+                 {
+                    name: "পদার্থবিজ্ঞান প্রথম পত্র",
+                    chapters: [
+                        "অধ্যায় ১: ভৌতজগৎ ও পরিমাপ",
+                        "অধ্যায় ২: ভেক্টর",
+                        "অধ্যায় ৩: গতিবিদ্যা",
+                        "অধ্যায় ৪: নিউটনীয় বলবিদ্যা",
+                        "অধ্যায় ৫: কাজ, শক্তি ও ক্ষমতা",
+                        "অধ্যায় ৬: মহাকর্ষ ও অভিকর্ষ",
+                        "অধ্যায় ৭: পদার্থের গাঠনিক ধর্ম",
+                        "অধ্যায় ৮: পর্যাবৃত্তিক গতি",
+                        "অধ্যায় ৯: তরঙ্গ",
+                        "অধ্যায় ১০: আদর্শ গ্যাস ও গ্যাসের গতিতত্ত্ব"
+                    ].filter(chapter => chapter.trim() !== ""),
+                },
+                {
+                    name: "পদার্থবিজ্ঞান দ্বিতীয় পত্র",
+                    chapters: [
+                       "অধ্যায় ১: তাপগতিবিদ্যা",
+                       "অধ্যায় ২: স্থির তড়িৎ",
+                       "অধ্যায় ৩: চল তড়িৎ",
+                       "অধ্যায় ৪: তড়িৎ প্রবাহের চৌম্বক ক্রিয়া ও চৌম্বকত্ব",
+                       "অধ্যায় ৫: তাড়িতচৌম্বক আবেশ ও পরিবর্তী প্রবাহ",
+                       "অধ্যায় ৬: জ্যামিতিক আলোকবিজ্ঞান",
+                       "অধ্যায় ৭: ভৌত আলোকবিজ্ঞান",
+                       "অধ্যায় ৮: আধুনিক পদার্থবিজ্ঞানের সূচনা",
+                       "অধ্যায় ৯: পরমাণুর মডেল এবং নিউক্লিয়ার পদার্থবিজ্ঞান",
+                       "অধ্যায় ১০: সেমিকন্ডাক্টর ও ইলেকট্রনিক্স",
+                       "অধ্যায় ১১: জ্যোতির্বিজ্ঞান"
+                    ].filter(chapter => chapter.trim() !== ""),
+                },
+                 {
+                    name: "রসায়ন প্রথম পত্র",
+                    chapters: [
+                        "অধ্যায় ১: ল্যাবরেটরির নিরাপদ ব্যবহার",
+                        "অধ্যায় ২: গুণগত রসায়ন",
+                        "অধ্যায় ৩: মৌলের পর্যায়বৃত্ত ধর্ম ও রাসায়নিক বন্ধন",
+                        "অধ্যায় ৪: রাসায়নিক পরিবর্তন",
+                        "অধ্যায় ৫: কর্মমুখী রসায়ন"
+                    ].filter(chapter => chapter.trim() !== ""),
+                },
+                {
+                    name: "রসায়ন দ্বিতীয় পত্র",
+                    chapters: [
+                        "অধ্যায় ১: পরিবেশ রসায়ন",
+                        "অধ্যায় ২: জৈব রসায়ন",
+                        "অধ্যায় ৩: পরিমাণগত রসায়ন",
+                        "অধ্যায় ৪: তড়িৎ রসায়ন",
+                        "অধ্যায় ৫: অর্থনৈতিক রসায়ন"
+                    ].filter(chapter => chapter.trim() !== ""),
+                },
+                {
+                    name: "জীববিজ্ঞান প্রথম পত্র (উদ্ভিদবিজ্ঞান)",
+                    chapters: [
+                        "অধ্যায় ১: কোষ ও এর গঠন",
+                        "অধ্যায় ২: কোষ বিভাজন",
+                        "অধ্যায় ৩: কোষ রসায়ন",
+                        "অধ্যায় ৪: অণুজীব",
+                        "অধ্যায় ৫: শৈবাল ও ছত্রাক",
+                        "অধ্যায় ৬: ব্রায়োফাইটা ও টেরিডোফাইটা",
+                        "অধ্যায় ৭: নগ্নবীজী ও আবৃতবীজী উদ্ভিদ",
+                        "অধ্যায় ৮: টিস্যু ও টিস্যুতন্ত্র",
+                        "অধ্যায় ৯: উদ্ভিদ শারীরতত্ত্ব",
+                        "অধ্যায় ১০: উদ্ভিদ প্রজনন",
+                        "অধ্যায় ১১: জীব প্রযুক্তি",
+                        "অধ্যায় ১২: জীবের পরিবেশ, বিস্তার ও সংরক্ষণ"
+                    ].filter(chapter => chapter.trim() !== ""),
+                },
+                {
+                    name: "জীববিজ্ঞান দ্বিতীয় পত্র (প্রাণিবিজ্ঞান)",
+                    chapters: [
+                        "অধ্যায় ১: প্রাণীর বিভিন্নতা ও শ্রেণিবিন্যাস",
+                        "অধ্যায় ২: প্রাণীর পরিচিতি (হাইড্রা, ঘাসফড়িং, রুই মাছ)",
+                        "অধ্যায় ৩: পরিপাক ও শোষণ",
+                        "অধ্যায় ৪: রক্ত ও সঞ্চালন",
+                        "অধ্যায় ৫: শ্বাস ক্রিয়া ও শ্বসন",
+                        "অধ্যায় ৬: বর্জ্য ও নিষ্কাশন",
+                        "অধ্যায় ৭: চলন ও অঙ্গচালনা",
+                        "অধ্যায় ৮: সমন্বয় ও নিয়ন্ত্রণ",
+                        "অধ্যায় ৯: মানব জীবনের ধারাবাহিকতা",
+                        "অধ্যায় ১০: মানবদেহের প্রতিরক্ষা",
+                        "অধ্যায় ১১: জিনতত্ত্ব ও বিবর্তন",
+                        "অধ্যায় ১২: প্রাণীর আচরণ"
+                    ].filter(chapter => chapter.trim() !== ""),
+                },
+                 {
+                    name: "উচ্চতর গণিত প্রথম পত্র",
+                    chapters: [
+                        "অধ্যায় ১: ম্যাট্রিক্স ও নির্ণায়ক",
+                        "অধ্যায় ২: ভেক্টর",
+                        "অধ্যায় ৩: সরলরেখা",
+                        "অধ্যায় ৪: বৃত্ত",
+                        "অধ্যায় ৫: বিন্যাস ও সমাবেশ",
+                        "অধ্যায় ৬: ত্রিকোণমিতিক অনুপাত",
+                        "অধ্যায় ৭: সংযুক্ত কোণের ত্রিকোণমিতিক অনুপাত",
+                        "অধ্যায় ৮: ফাংশন ও ফাংশনের লেখচিত্র",
+                        "অধ্যায় ৯: অন্তরীকরণ",
+                        "অধ্যায় ১০: যোগজীকরণ"
+                    ].filter(chapter => chapter.trim() !== ""),
+                },
+                {
+                    name: "উচ্চতর গণিত দ্বিতীয় পত্র",
+                    chapters: [
+                        "অধ্যায় ১: বাস্তব সংখ্যা ও অসমতা",
+                        "অধ্যায় ২: যোগাশ্রয়ী প্রোগ্রাম",
+                        "অধ্যায় ৩: জটিল সংখ্যা",
+                        "অধ্যায় ৪: বহুপদী ও বহুপদী সমীকরণ",
+                        "অধ্যায় ৫: দ্বিপদী বিস্তৃতি",
+                        "অধ্যায় ৬: কণিক",
+                        "অধ্যায় ৭: বিপরীত ত্রিকোণমিতিক ফাংশন ও ত্রিকোণমিতিক সমীকরণ",
+                        "অধ্যায় ৮: স্থিতিবিদ্যা",
+                        "অধ্যায় ৯: সমতলে বস্তুকণার গতি",
+                        "অধ্যায় ১০: বিস্তার পরিমাপ ও সম্ভাবনা"
+                    ].filter(chapter => chapter.trim() !== ""),
+                }
+            ];
+
+            // --- DOM Elements ---
+            const subjectsContainer = document.getElementById('subjects-container');
+            const summarySection = document.getElementById('summary-section');
+            const summaryContent = document.getElementById('summary-content');
+            const summaryTitleDisplay = document.getElementById('summary-display-title');
+            const summaryNotesContainerDisplay = document.getElementById('summary-display-notes-container');
+            const showSummaryBtn = document.getElementById('show-summary-btn');
+            const printSyllabusBtn = document.getElementById('print-syllabus-btn');
+            const clearSelectionBtn = document.getElementById('clear-selection-btn');
+            const globalNotesTextarea = document.getElementById('global-notes-textarea');
+            const syllabusTitleInput = document.getElementById('syllabus-title');
+
+            // --- Local Storage Keys (v6 for 2026 syllabus version) ---
+            const SELECTED_CHAPTERS_STORAGE_KEY = 'hsc_science_syllabus_selected_chapters_v6';
+            const GLOBAL_NOTES_STORAGE_KEY = 'hsc_science_syllabus_global_notes_v6';
+            const SUBJECT_NOTES_STORAGE_KEY = 'hsc_science_syllabus_subject_notes_v6';
+            const SYLLABUS_TITLE_STORAGE_KEY = 'hsc_science_syllabus_title_v6';
+
+
+            // --- Data Storage (in memory and local storage) ---
+            let selectedChapters = [];
+            let globalNotes = '';
+            let subjectNotes = {}; // Object to store subject-specific notes { 'Subject Name': 'Note text', ... }
+            let syllabusTitle = '';
+
+            // --- Local Storage Functions ---
+            function loadData() {
+                // Load selected chapters
+                const savedChapters = localStorage.getItem(SELECTED_CHAPTERS_STORAGE_KEY);
+                try {
+                    selectedChapters = savedChapters ? JSON.parse(savedChapters) : [];
+                     // Ensure loaded chapters are valid based on current subjects data
+                    const allAvailableChapters = subjects.flatMap(subj => subj.chapters.map(chap => `${subj.name} - ${chap}`));
+                    selectedChapters = selectedChapters.filter(chap => allAvailableChapters.includes(chap));
+
+                } catch (e) {
+                    console.error("Error loading selected chapters from local storage:", e);
+                    selectedChapters = []; // Reset if loading fails
+                }
+
+                // Load global notes
+                globalNotes = localStorage.getItem(GLOBAL_NOTES_STORAGE_KEY) || '';
+                globalNotesTextarea.value = globalNotes;
+
+                // Load subject notes
+                const savedSubjectNotes = localStorage.getItem(SUBJECT_NOTES_STORAGE_KEY);
+                 try {
+                    subjectNotes = savedSubjectNotes ? JSON.parse(savedSubjectNotes) : {};
+                     // Optional: Clean up subjectNotes if subjects were removed/renamed
+                     const currentSubjectNames = subjects.map(subj => subj.name);
+                     for (const subjectName in subjectNotes) {
+                         if (!currentSubjectNames.includes(subjectName)) {
+                             delete subjectNotes[subjectName]; // Remove notes for non-existent subjects
+                         }
+                     }
+                 } catch (e) {
+                     console.error("Error loading subject notes from local storage:", e);
+                     subjectNotes = {}; // Reset if loading fails
+                 }
+
+
+                // Load title
+                syllabusTitle = localStorage.getItem(SYLLABUS_TITLE_STORAGE_KEY) || '';
+                syllabusTitleInput.value = syllabusTitle;
+
+                // Update initial UI based on loaded data
+                renderSubjects();
+            }
+
+            function saveSelectedChapters() {
+                try {
+                    localStorage.setItem(SELECTED_CHAPTERS_STORAGE_KEY, JSON.stringify(selectedChapters));
+                } catch (e) {
+                    console.error("Error saving selected chapters to local storage:", e);
+                }
+            }
+
+            function saveGlobalNotes() {
+                globalNotes = globalNotesTextarea.value;
+                localStorage.setItem(GLOBAL_NOTES_STORAGE_KEY, globalNotes);
+            }
+
+             function saveSubjectNotes(subjectName, notes) {
+                 subjectNotes[subjectName] = notes;
+                 try {
+                     localStorage.setItem(SUBJECT_NOTES_STORAGE_KEY, JSON.stringify(subjectNotes));
+                 } catch (e) {
+                     console.error("Error saving subject notes to local storage:", e);
+                 }
+             }
+
+             function saveSyllabusTitle() {
+                 syllabusTitle = syllabusTitleInput.value.trim();
+                 localStorage.setItem(SYLLABUS_TITLE_STORAGE_KEY, syllabusTitle);
+             }
+
+
+            // --- Render Subjects and Chapters ---
+            function renderSubjects() {
+                subjectsContainer.innerHTML = '<h2>বিষয় এবং অধ্যায় তালিকা (বিজ্ঞান বিভাগ - ২০২৬ পূর্ণাঙ্গ সিলেবাস)</h2>' +
+                    `<!--\n\t** HSC 2026 Full Syllabus Note: **\n\tThe syllabus data above is based on the provided list for the potential 2026 full syllabus.\n\tPlease cross-check with the final official syllabus released by the board.\n\tEnglish 1st Paper units are placeholders; verify against the official 2026 NCTB book.\n\n\tTo add other streams (Humanities, Business Studies), add new objects to the 'subjects' array following the existing structure.\n-->`; // Clear previous content, keep updated comment
+
+                subjects.forEach((subject, subIndex) => {
+                    const subjectDiv = document.createElement('div');
+                    subjectDiv.classList.add('subject');
+
+                    const subjectHeader = document.createElement('div');
+                    subjectHeader.classList.add('subject-header');
+                    subjectHeader.innerHTML = `
+                        <span>${subject.name}</span>
+                        <span class="arrow">></span>
+                    `;
+                    // Add click listener to header to toggle content
+                    subjectHeader.addEventListener('click', () => {
+                         const subjectContentDiv = subjectDiv.querySelector('.subject-content');
+                         const arrow = subjectHeader.querySelector('.arrow');
+                         const isOpen = subjectContentDiv.classList.contains('open');
+
+                         // Close other open subjects (optional but can keep UI cleaner)
+                         document.querySelectorAll('.subject-content.open').forEach(openContent => {
+                             if (openContent !== subjectContentDiv) {
+                                 openContent.classList.remove('open');
+                                 openContent.style.maxHeight = '0';
+                                 openContent.closest('.subject').querySelector('.subject-header').classList.remove('active');
+                             }
+                         });
+
+
+                        if (isOpen) {
+                             subjectContentDiv.classList.remove('open');
+                             subjectHeader.classList.remove('active');
+                             subjectContentDiv.style.maxHeight = '0'; // Collapse
+                        } else {
+                             subjectContentDiv.classList.add('open');
+                             subjectHeader.classList.add('active');
+                             // Set max-height based on content height + buffer
+                             // Use a timeout to allow the grid to render first
+                             setTimeout(() => {
+                                subjectContentDiv.style.maxHeight = (subjectContentDiv.scrollHeight + 100) + 'px'; // Add buffer
+                             }, 50); // Small delay
+                             // Smooth scroll to the header
+                             subjectHeader.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }
+                    });
+                    subjectDiv.appendChild(subjectHeader);
+
+
+                    const subjectContentDiv = document.createElement('div'); // Container for chapters and notes
+                    subjectContentDiv.classList.add('subject-content');
+
+                    // Chapter List within content
+                    const chapterListDiv = document.createElement('div');
+                    chapterListDiv.classList.add('chapter-list');
+                    const chapterListHeading = document.createElement('h3');
+                    chapterListHeading.textContent = 'অধ্যায়/বিষয়সমূহ:'; // Updated heading
+                    chapterListDiv.appendChild(chapterListHeading);
+
+                     // Group chapters by prefix (e.g., গদ্য, পদ্য, Grammar, Reading, অধ্যায় ১)
+                    const groupedChapters = subject.chapters.reduce((acc, chapter) => {
+                        const parts = chapter.split(': ', 2); // Split only on the first ': '
+                        const prefix = parts.length > 1 ? parts[0] : 'সাধারণ'; // Use 'সাধারণ' if no prefix
+                        const chapterName = parts.length > 1 ? parts[1] : chapter;
+
+                        if (!acc[prefix]) {
+                            acc[prefix] = [];
+                        }
+                        acc[prefix].push(chapterName);
+                        return acc;
+                    }, {});
+
+
+                    const chapterListUl = document.createElement('ul'); // Use UL for structured list
+
+                    // Maintain a specific order for prefixes if needed
+                    const prefixOrder = ["গদ্য", "পদ্য", "সহপাঠ", "ব্যাকরণ", "নির্মিতি", "Unit", "বিশেষ অংশ", "Grammar", "Composition", "অধ্যায় ১", "অধ্যায় ২", "অধ্যায় ৩", "অধ্যায় ৪", "অধ্যায় ৫", "অধ্যায় ৬", "অধ্যায় ৭", "অধ্যায় ৮", "অধ্যায় ৯", "অধ্যায় ১০", "অধ্যায় ১১", "অধ্যায় ১২", "Writing"];
+                    const sortedPrefixes = Object.keys(groupedChapters).sort((a, b) => {
+                        const indexA = prefixOrder.indexOf(a);
+                        const indexB = prefixOrder.indexOf(b);
+                        if (a === 'সাধারণ') return 1; // Put 'সাধারণ' last
+                        if (b === 'সাধারণ') return -1;
+                        if (indexA !== -1 && indexB !== -1) return indexA - indexB; // Sort by predefined order
+                        if (indexA !== -1) return -1; // Keep known prefixes first
+                        if (indexB !== -1) return 1;
+                        return a.localeCompare(b, 'bn'); // Fallback to alphabetical for unknown prefixes
+                    });
+
+
+                    // for (const prefix in groupedChapters) {
+                    sortedPrefixes.forEach(prefix => {
+                        // Add group heading if not 'সাধারণ' or if it's the only group
+                        if (prefix !== 'সাধারণ' || Object.keys(groupedChapters).length === 1) {
+                             const groupHeading = document.createElement('div');
+                             groupHeading.classList.add('chapter-group-heading');
+                             groupHeading.textContent = prefix + ':';
+                             chapterListUl.appendChild(groupHeading);
+                        }
+
+
+                        groupedChapters[prefix].forEach((chapterName) => {
+                            const fullChapterText = `${prefix !== 'সাধারণ' ? prefix + ': ' : ''}${chapterName}`; // Reconstruct for value and display
+                             const chapterValue = `${subject.name} - ${fullChapterText}`;
+
+                            const li = document.createElement('li');
+                            const label = document.createElement('label');
+                            label.innerHTML = `
+                                <input type="checkbox" value="${chapterValue}">
+                                <span>${fullChapterText}</span>
+                            `;
+                            const checkbox = label.querySelector('input');
+
+                            // Set initial state from loaded data
+                            if (selectedChapters.includes(chapterValue)) {
+                                checkbox.checked = true;
+                            }
+
+                            // Add event listener to checkbox
+                            checkbox.addEventListener('change', handleCheckboxChange);
+
+                            li.appendChild(label);
+                            chapterListUl.appendChild(li);
+                        });
+                    }); // End loop through prefixes
+
+                     chapterListDiv.appendChild(chapterListUl);
+                    subjectContentDiv.appendChild(chapterListDiv);
+
+
+                    // Subject Notes within content
+                    const subjectNotesDiv = document.createElement('div');
+                    subjectNotesDiv.classList.add('subject-notes');
+                    const notesHeading = document.createElement('h3');
+                    notesHeading.textContent = 'এই বিষয়ের নোটস:';
+                    subjectNotesDiv.appendChild(notesHeading);
+
+                    const notesTextarea = document.createElement('textarea');
+                    notesTextarea.classList.add('subject-notes-textarea');
+                    notesTextarea.dataset.subjectName = subject.name; // Store subject name
+                    notesTextarea.placeholder = `এখানে ${subject.name} এর জন্য আপনার নোট লিখুন...`;
+
+                     // Load existing notes for this subject
+                    notesTextarea.value = subjectNotes[subject.name] || '';
+
+                     // Add input listener for auto-saving subject notes
+                    notesTextarea.addEventListener('input', (event) => {
+                        saveSubjectNotes(subject.name, event.target.value);
+                    });
+
+                    subjectNotesDiv.appendChild(notesTextarea);
+                    subjectContentDiv.appendChild(subjectNotesDiv); // Add notes div to subject content
+
+
+                    subjectDiv.appendChild(subjectContentDiv); // Add content container to subject div
+                    subjectsContainer.appendChild(subjectDiv);
+                });
+
+                 // Re-calculate max-height for already open lists after render if needed (optional)
+                 // Use a timeout to allow rendering
+                 setTimeout(() => {
+                     document.querySelectorAll('.subject-content.open').forEach(content => {
+                         content.style.maxHeight = (content.scrollHeight + 100) + 'px'; // Add buffer
+                     });
+                 }, 100);
+
+            }
+
+            // --- Handle Checkbox Change ---
+            function handleCheckboxChange(event) {
+                const chapterValue = event.target.value;
+                if (event.target.checked) {
+                    if (!selectedChapters.includes(chapterValue)) {
+                        selectedChapters.push(chapterValue);
+                    }
+                } else {
+                    selectedChapters = selectedChapters.filter(chap => chap !== chapterValue);
+                }
+                saveSelectedChapters(); // Save selection to local storage
+            }
+
+            // --- Generate Summary HTML ---
+            function generateSummary() {
+                const currentTitle = syllabusTitleInput.value.trim() || "নির্বাচিত সিলেবাস (HSC 2026)";
+                const currentGlobalNotes = globalNotesTextarea.value.trim();
+
+                let summaryTableHtml = '';
+                let notesHtml = ''; // HTML for notes section in summary
+
+                // Add title (handled separately for display and print)
+                summaryTitleDisplay.textContent = currentTitle;
+
+
+                if (selectedChapters.length === 0) {
+                    summaryTableHtml += "<p>কোন অধ্যায়/বিষয় নির্বাচন করা হয়নি।</p>";
+                } else {
+                    // Group chapters by subject
+                    const groupedChapters = {};
+                    selectedChapters.forEach(chapter => {
+                        const firstDashIndex = chapter.indexOf(' - ');
+                        if (firstDashIndex === -1) {
+                             const subjectName = "অন্যান্য / অনির্ধারিত";
+                             const chapterName = chapter;
+                             if (!groupedChapters[subjectName]) groupedChapters[subjectName] = [];
+                             groupedChapters[subjectName].push(chapterName);
+                        } else {
+                            const subjectName = chapter.substring(0, firstDashIndex).trim();
+                            const chapterName = chapter.substring(firstDashIndex + 3).trim();
+                            if (!groupedChapters[subjectName]) {
+                                groupedChapters[subjectName] = [];
+                            }
+                            groupedChapters[subjectName].push(chapterName);
+                        }
+                    });
+
+                    summaryTableHtml += '<table class="summary-table">';
+                    summaryTableHtml += '<thead><tr><th>বিষয়</th><th>নির্বাচিত অধ্যায়/বিষয়সমূহ</th></tr></thead>';
+                    summaryTableHtml += '<tbody>';
+
+                     // Get subjects in a defined order (same as 'subjects' array)
+                    const orderedSubjects = subjects.map(subj => subj.name);
+                    const sortedSubjectNames = Object.keys(groupedChapters).sort((a, b) => {
+                         const indexA = orderedSubjects.indexOf(a);
+                         const indexB = orderedSubjects.indexOf(b);
+                         if (indexA === -1 && indexB === -1) return a.localeCompare(b, 'bn'); // Both unknown, sort alphabetically
+                         if (indexA === -1) return 1; // a is unknown, put at end
+                         if (indexB === -1) return -1; // b is unknown, put at end
+                         return indexA - indexB; // Sort by original subjects array order
+                    });
+
+
+                    sortedSubjectNames.forEach(subjectName => {
+                         // Sort chapters/topics alphabetically within each subject for the summary display
+                        const itemsInSubject = groupedChapters[subjectName].sort((a, b) => {
+                            // Simple alphabetical sort, as detailed prefix sorting might be too much here
+                            return a.localeCompare(b, 'bn');
+                        });
+                        summaryTableHtml += `<tr>`;
+                        summaryTableHtml += `<td>${subjectName}</td>`;
+                        summaryTableHtml += `<td><ul>`;
+                        itemsInSubject.forEach(itemText => {
+                             // Display item text as is (includes prefix if originally present)
+                            summaryTableHtml += `<li>${itemText}</li>`;
+                        });
+                        summaryTableHtml += `</ul></td>`;
+                        summaryTableHtml += `</tr>`;
+                    });
+
+                    summaryTableHtml += '</tbody></table>';
+                }
+
+                // Add Subject Notes to the notesHtml if they exist and have content
+                 const orderedSubjectNamesForNotes = subjects.map(subj => subj.name); // Ensure notes appear in subject order
+                 orderedSubjectNamesForNotes.forEach(subjectName => {
+                     const currentSubjectNote = subjectNotes[subjectName] ? subjectNotes[subjectName].trim() : '';
+                     if (currentSubjectNote) {
+                         notesHtml += `
+                             <div class="summary-notes-item subject-notes">
+                                 <h4>${subjectName} এর নোটস:</h4>
+                                 <pre>${currentSubjectNote}</pre>
+                             </div>
+                         `;
+                     }
+                 });
+
+
+                // Add Global Notes to the notesHtml if they exist and have content
+                 if (currentGlobalNotes) {
+                     notesHtml += `
+                         <div class="summary-notes-item global-notes">
+                             <h4>সার্বজনীন নোটস:</h4>
+                             <pre>${currentGlobalNotes}</pre>
+                         </div>
+                     `;
+                 }
+
+
+                // Append the generated HTML to the summary content area
+                summaryContent.innerHTML = summaryTableHtml;
+
+                // Add the generated notes HTML to the notes container area
+                if (notesHtml) {
+                    summaryNotesContainerDisplay.innerHTML = '<h3>নোটস</h3>' + notesHtml;
+                    summaryNotesContainerDisplay.style.display = 'block';
+                } else {
+                    summaryNotesContainerDisplay.innerHTML = '';
+                    summaryNotesContainerDisplay.style.display = 'none';
+                }
+
+            }
+
+            // --- Button Event Listeners ---
+            showSummaryBtn.addEventListener('click', () => {
+                 saveSyllabusTitle(); // Save title
+                 saveGlobalNotes(); // Save global notes
+                 // Subject notes are saved automatically on input
+
+                 generateSummary(); // Generates table and populates notes/title displays
+                 summarySection.style.display = 'block';
+                 // Scroll to the summary section smoothly
+                 summarySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+
+            printSyllabusBtn.addEventListener('click', () => {
+                 saveSyllabusTitle(); // Save title
+                 saveGlobalNotes(); // Save global notes
+                 // Subject notes are saved automatically on input
+
+                 // Generate summary content first, this also populates the summary display elements used by print
+                 generateSummary();
+
+                 // Ensure summary section is visible with correct content before print
+                 summarySection.style.display = 'block';
+
+
+                // Use a timeout to ensure the DOM updates are rendered before printing
+                setTimeout(() => {
+                    window.print();
+                }, 300); // Increased delay for complex layout and notes
+            });
+
+            clearSelectionBtn.addEventListener('click', () => {
+                // Clear selected chapters from memory and storage
+                selectedChapters = [];
+                saveSelectedChapters();
+
+                // Optionally clear notes and title:
+                // globalNotesTextarea.value = '';
+                // saveGlobalNotes();
+                // subjectNotes = {};
+                // localStorage.removeItem(SUBJECT_NOTES_STORAGE_KEY); // Clear subject notes storage
+                // syllabusTitleInput.value = '';
+                // saveSyllabusTitle();
+
+
+                renderSubjects(); // Re-render to uncheck all checkboxes (and load notes if not cleared)
+
+                // Hide and reset summary display only
+                summaryContent.innerHTML = "<p>কোন অধ্যায়/বিষয় নির্বাচন করা হয়নি।</p>"; // Reset summary table area
+                summarySection.style.display = 'none'; // Hide the whole summary section
+                 summaryTitleDisplay.textContent = ''; // Clear display title
+                 summaryNotesContainerDisplay.innerHTML = ''; // Clear notes container display
+                 summaryNotesContainerDisplay.style.display = 'none'; // Hide notes container
+
+
+            });
+
+            // --- Auto-save Notes and Title on Input ---
+            globalNotesTextarea.addEventListener('input', saveGlobalNotes);
+            syllabusTitleInput.addEventListener('input', saveSyllabusTitle);
+
+            // Note: Subject notes textareas get their event listeners added during renderSubjects()
+
+
+            // --- Adjust subject content max-height on window resize ---
+            window.addEventListener('resize', () => {
+                document.querySelectorAll('.subject-content.open').forEach(content => {
+                     // Temporarily remove transition to avoid animation during resize
+                    content.style.transition = 'none';
+                    content.style.maxHeight = (content.scrollHeight + 100) + 'px'; // Add buffer
+                     // Re-add transition after a short delay
+                    setTimeout(() => {
+                        content.style.transition = 'max-height 0.6s ease-in-out';
+                    }, 50);
+                });
+            });
+
+
+            // --- Initial Load ---
+            loadData(); // Load saved data and render the page
+
+
+        }); // End DOMContentLoaded
+    </script>
+
+</body>
+</html>
